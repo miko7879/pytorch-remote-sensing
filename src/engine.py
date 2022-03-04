@@ -1,4 +1,4 @@
-from config import DEVICE, NUM_CLASSES, EPOCHS, OUT_DIR, SAVE_PLOTS_EPOCH, SAVE_MODEL_EPOCH
+from config import DEVICE, NUM_CLASSES, EPOCHS, OUT_DIR, SAVE_PLOTS_EPOCH, SAVE_MODEL_EPOCH, LR, MOMENTUM
 from utils import Averager
 from dataset import train_loader, valid_loader
 from model import create_model
@@ -96,7 +96,7 @@ if __name__ == '__main__':
     
     #Extract requisite parameters and instantiate optimizer
     params = [p for p in model.parameters() if p.requires_grad]
-    optim = torch.optim.SGD(params, lr = 0.001, momentum = 0.99)
+    optim = torch.optim.SGD(params, lr = LR, momentum = MOMENTUM)
     
     #Initialize helper objects, lists, and counters
     train_loss_hist = Averager()

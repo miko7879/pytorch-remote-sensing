@@ -4,20 +4,17 @@ import torch
 import glob as glob
 
 from model import create_model
-from config import CLASSES, NUM_CLASSES, OUT_DIR, INF_DIR, DEVICE
+from config import CLASSES, NUM_CLASSES, OUT_DIR, INF_DIR, DEVICE, DETECTION_THRESHOLD
 
 #Create the model and load the trained parameters
 model = create_model(num_classes = NUM_CLASSES)
-model.load_state_dict(torch.load(OUT_DIR + 'model_e54.pth'))
+model.load_state_dict(torch.load(OUT_DIR + 'model_final.pth'))
 model.eval()
 model.to(DEVICE)
 
 #Grab all files from the inference directory
 infer_imgs = glob.glob(f'{INF_DIR}*')
 print(f'Number if images to inference on: {len(infer_imgs)}')
-
-#Let's define the detection thresgold as 0.8, i.e. to be considered a valid detection we need a score of 0.8 or higher
-detection_threshold = 0.7
 
 #Lastly, let's loop over our images
 for i in range(len(infer_imgs)):
@@ -30,7 +27,7 @@ for i in range(len(infer_imgs)):
     img = np.transpose(img, (2, 0, 1)).astype(np.float)#Place colour channel first, then height, then width
     img = torch.tensor(img, dtype = torch.float) #Convert image to tensor
     img = torch.unsqueeze(img, 0) #Add batch dimension
-    img = img.to(DEVICE)
+    img = img.to(DEVICE) #Push to device
     
     #Get predictions
     with torch.no_grad():
@@ -45,7 +42,7 @@ for i in range(len(infer_imgs)):
         #Extract the boxes
         boxes = preds['boxes'].data.numpy()
         scores = preds['scores'].data.numpy()
-        boxes = boxes[scores >= detection_threshold].astype(np.int32) #Extract valid bounding boxes and convert to requisite type
+        boxes = boxes[scores >= DETECTION_THRESHOLD].astype(np.int32) #Extract valid bounding boxes and convert to requisite type
         draw_boxes = boxes.copy() #Make a copy for further manipulation
         
         #Extract the labels
@@ -55,16 +52,8 @@ for i in range(len(infer_imgs)):
         for j, box in enumerate(draw_boxes):
             cv2.rectangle(orig_img, (int(box[0]), int(box[1])), (int(box[2]), int(box[3])), (0, 0, 255), 2)
             cv2.putText(orig_img, labels[j], (int(box[0]), int(box[1]-5)), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2, lineType=cv2.LINE_AA)
-            
-        #Show the prediction
-        #cv2.imshow('Prediction', orig_img)
-        
-        #Wait for key press
-        #cv2.waitKey(1)
         
     #Write the image
     cv2.imwrite(f'{OUT_DIR}inference/{img_name}.jpg', orig_img,)
         
     print(f'Image {i + 1} complete')
-    
-cv2.destroyAllWindows()

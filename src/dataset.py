@@ -74,9 +74,6 @@ class AirplaneDataset(Dataset):
             xmax = xmax/iwidth*self.width
             ymax = ymax/iheight*self.height
             
-            if xmax > 1024 or ymax > 1024:
-                print(iname, xmin, ymin, xmax, ymax, cls)
-            
             #Add to our list
             boxes.append([xmin, ymin, xmax, ymax])
             
@@ -139,7 +136,8 @@ if __name__ == '__main__':
             
         cv2.imshow('Image', image)
         cv2.waitKey(0)
-        
+    
+    #Visualize a few samples to confirm data is loaded correctly
     NUM_SAMPLES_TO_VISUALIZE = 5
     for i in range(NUM_SAMPLES_TO_VISUALIZE):
         image, target = dataset[i]
