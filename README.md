@@ -1,4 +1,4 @@
-# aircraft-detection
+# Remote Sensing: Automatic Aircraft Detection in Satellite Imagery
 Aircraft detection using the 'Airbus Aircraft Detection' dataset and Faster-RCNN with ResNet-50 backbone.
 
 Original dataset can be found here: https://www.kaggle.com/airbusgeo/airbus-aircrafts-sample-dataset
